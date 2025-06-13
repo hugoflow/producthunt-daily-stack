@@ -1,0 +1,167 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Hugo and Pagefind
+    runs-on: ubuntu-latest
+    outputs:
+      public-path: ${{ steps.upload.outputs.public-path }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: 'latest'
+          extended: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pagefind
+        run: npm install pagefind
+
+      - name: Build site
+        run: |
+          hugo --minify
+          npx pagefind --source public
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: public
+          path: public
+
+  deploy_firebase:
+    name: Deploy to Firebase Hosting
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: public
+          path: public
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools@14.5.1
+
+      - name: Write Firebase service account key
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).firebase }}
+        run: echo "$FIREBASE_SERVICE_ACCOUNT" > firebase-key.json
+
+      - name: Deploy to Firebase Hosting
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: firebase-key.json
+          FIREBASE_PROJECT_ID: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).firebase.project_id }}
+        run: firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID"
+
+  deploy_vercel:
+    name: Deploy to Vercel
+    needs: build
+    runs-on: ubuntu-latest
+    # 设置环境变量，Vercel CLI 会优先使用它们
+    env:
+      VERCEL_TOKEN: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).vercel_token }}
+      VERCEL_PROJECT_ID: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).vercel_projectId }}
+      VERCEL_ORG_ID: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).vercel_orgId }}
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4 # 建议使用最新版 v4
+        with:
+          name: public # 假设你的构建产物名为 public
+          path: public # 下载到 ./public 目录
+
+      - name: Setup Node.js (for Vercel CLI)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # 或者你需要的 Node.js 版本
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest # 安装最新版 Vercel CLI
+
+      - name: Deploy to Vercel Production
+        # Vercel CLI 会自动使用 VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_ORG_ID 环境变量
+        run: |
+          echo "Deploying to Vercel Project: $VERCEL_PROJECT_ID under Org/User: $VERCEL_ORG_ID"
+          # 使用 ./public 作为要部署的目录
+          # --yes 用于自动确认
+          # --prod 用于部署到生产环境
+          # --prebuilt 因为我们已经构建好了
+          vercel deploy --prebuilt --prod --yes ./public
+          # Token, Project ID, 和 Org ID 会从环境变量中读取
+          # 如果环境变量没有被 CLI 自动识别，或者你想更明确，可以这样：
+          # vercel deploy --prebuilt --prod --yes ./public --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID"
+          # 注意：Vercel CLI 通常会优先使用 VERCEL_PROJECT_ID 环境变量来链接项目，
+          # 所以不需要在 deploy 命令中显式传递 project_id 参数。
+
+  deploy_netlify:
+    name: Deploy to Netlify
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: public
+          path: public
+
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: Deploy to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).netlify.auth_token }}
+          NETLIFY_SITE_ID: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).netlify.site_id }}
+        run: netlify deploy --auth "$NETLIFY_AUTH_TOKEN" --site "$NETLIFY_SITE_ID" --prod --dir=public
+
+  deploy_cloudflare_pages:
+    name: Deploy to Cloudflare Pages
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: public
+          path: public
+
+      - name: Install Wrangler CLI
+        run: npm install -g @cloudflare/wrangler
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CF_API_TOKEN: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).cloudflare.api_token }}
+          CF_ACCOUNT_ID: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).cloudflare.account_id }}
+          CF_PROJECT_NAME: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).cloudflare.project_name }}
+          CF_BRANCH: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).cloudflare.branch }}
+        run: |
+          wrangler pages publish ./public --project-name "$CF_PROJECT_NAME" --branch "$CF_BRANCH" --account-id "$CF_ACCOUNT_ID" --token "$CF_API_TOKEN"
+
+  deploy_github_pages:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: public
+          path: public
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ fromJson(secrets.DEPLOY_SECRETS_JSON).github_pages.token }}
+          publish_dir: ./public
