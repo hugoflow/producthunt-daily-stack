@@ -1,16 +1,25 @@
 # Configure main menu and social menu
-#[[main]]
-#identifier = "home"
-#name = "Home"
-#url = "/"
-#[main.params]
-#icon = "home"
-#newtab = true
+
+[[main]]
+identifier = "home"
+name = "首页"
+url = "/"
+[main.params]
+icon = "home"
+newtab = false
+
+[[main]]
+identifier = "blog"
+name = "Blog"
+url = "/blog/"
+[main.params]
+icon = "article"
+newtab = false
 
 [[social]]
 identifier = "github"
 name = "GitHub"
-url = "https://github.com/CaiJimmy/hugo-theme-stack"
+url = "https://github.com/hugoflow/producthunt-daily-stack"
 
 [social.params]
 icon = "brand-github"
