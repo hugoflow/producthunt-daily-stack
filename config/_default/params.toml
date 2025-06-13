@@ -1,150 +1,50 @@
-# Pages placed under these sections will be shown on homepage and archive page.
-mainSections = ["post"]
+# 首页展示 section 改为 news
+mainSections = ["news"]
 # Output page's full content in RSS.
 rssFullContent = true
 favicon = "/favicon.png"
 
 [footer]
-since = 2020
-customText = ""
+since = 2024
+customText = "每日自动聚合 Product Hunt 最新热榜，关注 AI 与产品创新！"
 
 [dateFormat]
-published = "Jan 02, 2006"
-lastUpdated = "Jan 02, 2006 15:04 MST"
+published = "2006-01-02"
+lastUpdated = "2006-01-02 15:04"
 
 [sidebar]
-emoji = "🍥"
-subtitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+emoji = "🚀"
+subtitle = "每日聚合 Product Hunt 最热新品，中文快讯"
+
+[params.seo]
+description = "Product Hunt 每日中文热榜，自动聚合全球最新 AI 产品、科技工具和创新新品资讯。每日更新，关注产品创新与科技趋势！"
+keywords = ["Product Hunt", "中文热榜", "AI 产品", "新品发布", "科技资讯", "工具推荐", "热门产品", "每日更新", "创新科技", "Product Hunt 今日新品", "AI 工具榜单", "科技新品资讯"]
 
 [sidebar.avatar]
-enabled = true
-local = true
-src = "img/avatar.png"
+enabled = false
 
 [article]
 headingAnchor = false
 math = false
-readingTime = true
+readingTime = false
 
 [article.license]
-enabled = true
-default = "Licensed under CC BY-NC-SA 4.0"
+enabled = false
 
-## Widgets
+## Widgets（如需精简可删除不需要的类型）
 [[widgets.homepage]]
 type = "search"
 
 [[widgets.homepage]]
-type = "archives"
-
-[widgets.homepage.params]
-limit = 5
-
-[[widgets.homepage]]
 type = "categories"
-
 [widgets.homepage.params]
 limit = 10
 
 [[widgets.homepage]]
 type = "tag-cloud"
-
 [widgets.homepage.params]
 limit = 10
 
-[[widgets.page]]
-type = "toc"
-
-[opengraph.twitter]
-site = ""
-card = "summary_large_image"
-
-[defaultImage.opengraph]
-enabled = false
-local = false
-src = ""
-
-[colorScheme]
-toggle = true
-default = "auto"
-
-[imageProcessing.cover]
-enabled = true
-
-[imageProcessing.content]
-enabled = true
-
-## Comments
+# 评论建议关闭
 [comments]
-enabled = true
-provider = "disqus"
-
-[comments.disqusjs]
-shortname = ""
-apiUrl = ""
-apiKey = ""
-admin = ""
-adminLabel = ""
-
-[comments.utterances]
-repo = ""
-issueTerm = "pathname"
-label = ""
-
-[comments.remark42]
-host = ""
-site = ""
-locale = ""
-
-[comments.vssue]
-platform = ""
-owner = ""
-repo = ""
-clientId = ""
-clientSecret = ""
-autoCreateIssue = false
-
-[comments.waline]
-serverURL = ""
-lang = ""
-visitor = ""
-avatar = ""
-emoji = ["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"]
-requiredMeta = ["name", "email", "url"]
-placeholder = ""
-
-[comments.waline.locale]
-admin = "Admin"
-
-[comments.twikoo]
-envId = ""
-region = ""
-path = ""
-lang = ""
-
-[comments.cactus]
-defaultHomeserverUrl = "https://matrix.cactus.chat:8448"
-serverName = "cactus.chat"
-siteName = ""
-
-[comments.giscus]
-repo = ""
-repoID = ""
-category = ""
-categoryID = ""
-mapping = ""
-lightTheme = ""
-darkTheme = ""
-reactionsEnabled = 1
-emitMetadata = 0
-
-[comments.gitalk]
-owner = ""
-admin = ""
-repo = ""
-clientID = ""
-clientSecret = ""
-
-[comments.cusdis]
-host = ""
-id = ""
+enabled = false

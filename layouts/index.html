@@ -1,0 +1,27 @@
+{{ define "main" }}
+  {{ $newsPages := where site.RegularPages "Section" "news" }}
+  <main class="main-content">
+    <h1>Product Hunt 每日中文热榜</h1>
+    <div class="news-list">
+      {{ range $newsPages.ByDate.Reverse }}
+        <article class="news-item">
+          <a href="{{ .RelPermalink }}">
+            <img src="{{ .Params.cover.image | default (index .Params.images 0) }}" alt="{{ .Params.cover.alt | default .Title }}" style="max-width:180px;" loading="lazy"/>
+            <h2>{{ .Title }}</h2>
+          </a>
+          <p>{{ .Params.description | default .Summary }}</p>
+          <div>
+            <span>票数：{{ .Params.votes }}</span>
+            {{ with .Params.tags }}
+              <span>标签：
+                {{ range . }}
+                  <span class="tag">{{ . }}</span>
+                {{ end }}
+              </span>
+            {{ end }}
+          </div>
+        </article>
+      {{ end }}
+    </div>
+  </main>
+{{ end }}
