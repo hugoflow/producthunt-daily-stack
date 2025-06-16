@@ -1,5 +1,7 @@
-# Change baseurl before deploy
-baseurl = "https://blog.ouraihub.com"
+# GitHub Pages 用户主页配置 (AIBriefs.github.io)
+# For local development, you can override with: hugo server --baseURL="http://localhost:1313"
+# baseurl = "https://blog.ouraihub.com"  # 自定义域名已注释
+baseurl = "https://AIBriefs.github.io"  # GitHub Pages 用户主页 URL
 languageCode = "zh-cn"
 title = "Product Hunt 每日中文热榜"
 defaultContentLanguage = "zh-cn"

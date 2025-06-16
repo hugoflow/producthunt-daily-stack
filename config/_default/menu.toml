@@ -4,6 +4,7 @@
 identifier = "home"
 name = "首页"
 url = "/"
+weight = 1
 [main.params]
 icon = "home"
 newtab = false
@@ -12,6 +13,7 @@ newtab = false
 identifier = "blog"
 name = "Blog"
 url = "/blog/"
+weight = 2
 [main.params]
 icon = "article"
 newtab = false
